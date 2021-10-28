@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tic_tac_toe_2022/ui/theme/color.dart';
 import 'package:tic_tac_toe_2022/utils/game_logic.dart';
+import 'package:tic_tac_toe_2022/utils/player_name_screen.dart';
+import 'package:get/get.dart';
 
 
 void main() {
@@ -12,14 +14,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: GameScreen(),
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        hintColor: Colors.grey
+      ),
+      home: PlayerNameScreen(),
     );
   }
 }
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({Key? key}) : super(key: key);
+  final String firstname;
+  final String secondname;
+  const GameScreen({Key? key,required this.firstname,required this.secondname}) : super(key: key);
 
   @override
   _GameScreenState createState() => _GameScreenState();
@@ -29,6 +37,7 @@ class _GameScreenState extends State<GameScreen> {
   //adding the necessary variables
   String lastValue = "X";
   bool gameOver = false;
+  var isfirstname;
   int turn = 0; // to check the draw
   String result = "";
   List<int> scoreboard = [
@@ -63,13 +72,21 @@ class _GameScreenState extends State<GameScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            gameOver==false?
+            isfirstname!=true?
             Text(
-              "It's ${lastValue} turn".toUpperCase(),
+              "It's ${widget.firstname} turn".toUpperCase(),
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 58,
+                fontSize: 25,
               ),
-            ),
+            ):Text(
+              "It's ${widget.secondname} turn".toUpperCase(),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 25,
+              ),
+            ):Container(),
             SizedBox(
               height: 20.0,
             ),
@@ -89,6 +106,7 @@ class _GameScreenState extends State<GameScreen> {
                     onTap: gameOver
                         ? null
                         : () {
+
                             //when we click we need to add the new value to the board and refrech the screen
                             //we need also to toggle the player
                             //now we need to apply the click only if the field is empty
@@ -102,7 +120,7 @@ class _GameScreenState extends State<GameScreen> {
                                     lastValue, index, scoreboard, 3);
 
                                 if (gameOver) {
-                                  result = "$lastValue is the Winner";
+                                  result = lastValue=="X"?"${widget.firstname} is the Winner":"${widget.secondname} is winner";
                                 } else if (!gameOver && turn == 9) {
                                   result = "It's a Draw!";
                                   gameOver = true;
@@ -112,6 +130,9 @@ class _GameScreenState extends State<GameScreen> {
                                 else
                                   lastValue = "X";
                               });
+                              game.board![index] == "X"
+                                  ? isfirstname=true
+                                  : isfirstname=false;
                             }
                           },
                     child: Container(
@@ -142,7 +163,7 @@ class _GameScreenState extends State<GameScreen> {
             ),
             Text(
               result,
-              style: TextStyle(color: Colors.white, fontSize: 54.0),
+              style: TextStyle(color: Colors.white, fontSize: 30.0),
             ),
             ElevatedButton.icon(
               onPressed: () {
@@ -151,6 +172,7 @@ class _GameScreenState extends State<GameScreen> {
                   game.board = Game.initGameBoard();
                   lastValue = "X";
                   gameOver = false;
+                  isfirstname=false;
                   turn = 0;
                   result = "";
                   scoreboard = [0, 0, 0, 0, 0, 0, 0, 0];
